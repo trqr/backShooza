@@ -3,6 +3,7 @@ package com.shooza.demo.controllers;
 import com.shooza.demo.models.User;
 import com.shooza.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,8 +14,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam User user){
+    public ResponseEntity<User> registerUser(@RequestBody User user){
         userService.registerUser(user);
-        return "user registered !";
+        return ResponseEntity.ok(user);
     }
 }
