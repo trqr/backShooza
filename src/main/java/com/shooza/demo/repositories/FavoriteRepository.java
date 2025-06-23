@@ -10,8 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
 
-  /*  @Modifying
-    @Transactional
-    @Query("INSERT INTO Favorite(f.user_id, f.product_id) VALUES (:productId, :userId)")
-            void  addNewFav(@Param("userId") int productId, @Param("userId") int userId ); */
+    void deleteByProductIdAndUserId(int productId, int userId);
+
 }

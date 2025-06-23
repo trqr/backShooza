@@ -24,9 +24,14 @@ public class FavoriteController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addToFavorites(@RequestBody FavoriteDTO favoriteDTO){
+    public ResponseEntity<?> addToFavorites(@RequestParam int productId, @RequestParam int userId){
+        FavoriteDTO favoriteDTO = new FavoriteDTO(productId, userId);
         return favoriteService.addToFavorites(favoriteDTO);
     }
 
+    @DeleteMapping("/remove")
+    public ResponseEntity<?> removeFromFavorites(@RequestParam int productId, @RequestParam int userId) {
+        return favoriteService.removeFromFavorites(productId, userId);
+    }
 
 }

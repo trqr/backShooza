@@ -9,7 +9,7 @@ public class FavoriteDTO {
     private int productId;
     private int userId;
 
-    FavoriteDTO(int productId, int userId){
+    public FavoriteDTO(int productId, int userId){
         this.productId = productId;
         this.userId = userId;
     }
