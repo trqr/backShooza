@@ -11,12 +11,12 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT p FROM Product p " +
-            "WHERE p.brand = :brand AND p.color LIKE %:color%")
+            "WHERE (:brand IS NULL OR :brand = '' OR p.brand = :brand) " +
+            "AND (:color IS NULL OR :color = '' OR p.color LIKE %:color%)")
     List<Product> findWithFilters(
             @org.springframework.lang.Nullable String brand,
             @org.springframework.lang.Nullable String color
     );
-
 
     @Query("SELECT f.product FROM Favorite f WHERE f.user.id = :userId")
     List<Product> findUserFavs(@Param("userId") int userId);
