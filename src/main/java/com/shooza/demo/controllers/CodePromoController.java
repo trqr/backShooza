@@ -18,6 +18,7 @@ public class CodePromoController {
 
     @PostMapping("")
     public CodePromo comparePromoCode(@RequestBody String promoCode){
+        System.out.println("test");
         return promoCodeRepository.findByCode(promoCode);
         }
 }
