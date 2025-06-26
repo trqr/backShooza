@@ -17,4 +17,5 @@ public class UserController {
     public ResponseEntity<String> registerUser(@RequestBody User user){
         return userService.registerUser(user);
     }
+
 }
