@@ -1,7 +1,7 @@
 package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.OrderRequest;
-import com.shooza.demo.DTO.UserDTO;
+import com.shooza.demo.DTO.OrderResponse;
 import com.shooza.demo.models.CartItem;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.models.Order;
@@ -35,9 +35,7 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest){
         Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(orderRequest.getPromoCode());
         CodePromo codePromo;
-        if (optionalCodePromo.isPresent()) {
-            codePromo = optionalCodePromo.get();
-        } else return ResponseEntity.ok("erreur de saisie");
+        codePromo = optionalCodePromo.orElse(null);
 
         Order newOrder = new Order(
                 userRepository.findByEmail(orderRequest.getUserEmail()),
@@ -49,10 +47,11 @@ public class OrderController {
 
         List<CartItem> cartItems = orderRequest.getCart();
         cartItems.forEach(item -> item.setOrder(newOrder));
-        newOrder.setItems(cartItems);
+        newOrder.setCart(cartItems);
         orderRepository.save(newOrder);
 
-        return ResponseEntity.ok("commande ajoutée !");
+        return ResponseEntity.ok(new OrderResponse(true, newOrder.getTotalPrice(), newOrder.getStatus(), "Commande enregistrée") {
+        });
     }
 
     @GetMapping("")

@@ -6,6 +6,7 @@ import com.shooza.demo.models.Product;
 import com.shooza.demo.models.User;
 import com.shooza.demo.repositories.FavoriteRepository;
 import com.shooza.demo.repositories.ProductRepository;
+import com.shooza.demo.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ public class FavoriteService {
     private ProductRepository productRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Product> getFavorites(int userId){
         return productRepository.findUserFavs(userId);
@@ -27,13 +30,12 @@ public class FavoriteService {
 
 
     public ResponseEntity<?> addToFavorites(FavoriteDTO favoriteDTO){
-        User newUser = new User();
-        newUser.setId(favoriteDTO.getUserId());
-        Product newProduct = new Product();
-        newProduct.setId(favoriteDTO.getProductId());
 
-
-        favoriteRepository.save(new Favorite(0, newUser, newProduct));
+        favoriteRepository.save(new Favorite(
+                0,
+                userRepository.getReferenceById(favoriteDTO.getUserId()),
+                productRepository.getReferenceById(favoriteDTO.getProductId())
+        ));
 
         return ResponseEntity.ok("Added to favorites");
     }

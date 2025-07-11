@@ -8,9 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 public class User {
     @GeneratedValue
     @Id
@@ -19,4 +18,13 @@ public class User {
     private String lastName;
     private String email;
     private String password;
+    private String role;
+
+    public User(String firstName, String lastName, String email, String password){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = "USER";
+    }
 }

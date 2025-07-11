@@ -1,6 +1,6 @@
 package com.shooza.demo.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -24,6 +23,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne
@@ -35,23 +35,23 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<CartItem> items;
+    private List<CartItem> cart;
 
-    public Order(User user, CodePromo codepromo, double delivery, double totalPrice, List<CartItem> items) {
+    public Order(User user, CodePromo codepromo, double delivery, double totalPrice, List<CartItem> cart) {
         this.user = user;
         this.codepromo = codepromo;
         this.delivery = delivery;
         this.totalPrice = totalPrice;
         this.status = "pending";
-        this.items = items;
+        this.cart = cart;
     }
 
-    public Order(User user, double delivery, double totalPrice, List<CartItem> items) {
+    public Order(User user, double delivery, double totalPrice, List<CartItem> cart) {
         this.user = user;
         this.codepromo = codepromo;
         this.delivery = delivery;
         this.totalPrice = totalPrice;
         this.status = "pending";
-        this.items = items;
+        this.cart = cart;
     }
 }
