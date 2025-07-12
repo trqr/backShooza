@@ -54,8 +54,13 @@ public class OrderController {
         });
     }
 
-    @GetMapping("")
+    @GetMapping("/user")
     public List<Order> getUserOrders(@RequestParam("userId") int userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+    @GetMapping("/all")
+    public List<Order> getOrders(){
+        return orderRepository.findAll();
     }
 }

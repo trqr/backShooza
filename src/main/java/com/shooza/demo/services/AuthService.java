@@ -30,7 +30,8 @@ public class AuthService {
 
             UserDTO userDTO = new UserDTO(
                     currentUser.getId(),
-                    currentUser.getEmail()
+                    currentUser.getEmail(),
+                    currentUser.getRole()
             );
 
             AuthResponse response = new AuthResponse(token, userDTO);
