@@ -2,6 +2,7 @@ package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.OrderRequest;
 import com.shooza.demo.DTO.OrderResponse;
+import com.shooza.demo.DTO.StatusUpdateRequest;
 import com.shooza.demo.models.CartItem;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.models.Order;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api")
 public class OrderController {
 
     @Autowired
@@ -31,7 +32,7 @@ public class OrderController {
     private CartItemRepository cartItemRepository;
 
     @Transactional
-    @PostMapping("/create-order")
+    @PostMapping("/order/create-order")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest){
         Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(orderRequest.getPromoCode());
         CodePromo codePromo;
@@ -54,12 +55,26 @@ public class OrderController {
         });
     }
 
-    @GetMapping("/user")
-    public List<Order> getUserOrders(@RequestParam("userId") int userId) {
-        return orderRepository.findByUserId(userId);
+    @PostMapping("/order/delete")
+    public void deleteOrders(@RequestBody List<Integer> ids) {
+        orderRepository.deleteAllById(ids);
     }
 
-    @GetMapping("/all")
+    @PostMapping("/order/status")
+    public void changeOrderStatus(@RequestBody StatusUpdateRequest request) {
+        List<Order> orders = orderRepository.findAllById(request.getIds());
+        for (Order order : orders) {
+            order.setStatus(request.getNewStatus());
+        }
+        orderRepository.saveAll(orders);
+    }
+
+    @GetMapping("order/user")
+    public List<Order> getUserOrders(@RequestParam("userId") int userId) {
+        return orderRepository.findOrdersWithoutUser(userId);
+    }
+
+    @GetMapping("order/all")
     public List<Order> getOrders(){
         return orderRepository.findAll();
     }
