@@ -1,5 +1,6 @@
 package com.shooza.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -17,14 +18,15 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
+
     private String password;
-    private String role;
+
+    private String role = "USER";
 
     public User(String firstName, String lastName, String email, String password){
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.role = "USER";
     }
 }

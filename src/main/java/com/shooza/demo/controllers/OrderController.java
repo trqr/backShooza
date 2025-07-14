@@ -10,8 +10,10 @@ import com.shooza.demo.repositories.CartItemRepository;
 import com.shooza.demo.repositories.OrderRepository;
 import com.shooza.demo.repositories.PromoCodeRepository;
 import com.shooza.demo.repositories.UserRepository;
+import com.shooza.demo.utils.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,8 @@ public class OrderController {
     private OrderRepository orderRepository;
     @Autowired
     private CartItemRepository cartItemRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Transactional
     @PostMapping("/order/create-order")
@@ -70,12 +74,39 @@ public class OrderController {
     }
 
     @GetMapping("order/user")
-    public List<Order> getUserOrders(@RequestParam("userId") int userId) {
-        return orderRepository.findOrdersWithoutUser(userId);
+    public ResponseEntity<?> getUserOrders(        @RequestHeader("Authorization") String authHeader,
+                                             @RequestParam("userId") int userId) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractUsername(token);
+        String role = jwtUtil.extractRole(token);
+
+        if (!role.equals("USER") && !role.equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès interdit");
+        }
+
+        return ResponseEntity.ok(orderRepository.findOrdersWithoutUser(userId));
     }
 
     @GetMapping("order/all")
-    public List<Order> getOrders(){
-        return orderRepository.findAll();
+    public ResponseEntity<?> getOrders(@RequestHeader("Authorization") String authHeader){
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractUsername(token);
+        String role = jwtUtil.extractRole(token);
+
+        if (!role.equals("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès interdit");
+        }
+
+        return ResponseEntity.ok(orderRepository.findAll());
     }
 }

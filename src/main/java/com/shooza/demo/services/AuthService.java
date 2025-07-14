@@ -26,7 +26,7 @@ public class AuthService {
     public ResponseEntity<?> signIn(AuthRequest authRequest){
         User currentUser = userRepository.findByEmail(authRequest.getEmail());
         if (currentUser != null && passwordEncoder.matches(authRequest.getPassword(), currentUser.getPassword())) {
-            String token = jwtUtil.generateToken(currentUser.getEmail());
+            String token = jwtUtil.generateToken(currentUser.getEmail(), currentUser.getRole());
 
             UserDTO userDTO = new UserDTO(
                     currentUser.getId(),
