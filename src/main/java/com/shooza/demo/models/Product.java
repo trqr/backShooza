@@ -23,4 +23,5 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @JsonManagedReference
     private List<ProductImage> imagesUrl;
+    private int stock;
 }

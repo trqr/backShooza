@@ -51,7 +51,15 @@ public class OrderController {
         );
 
         List<CartItem> cartItems = orderRequest.getCart();
-        cartItems.forEach(item -> item.setOrder(newOrder));
+
+        for (CartItem item : cartItems) {
+            if (item.getProduct().getStock() < item.getQuantity()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le produit " + item.getProduct().getName() + " n'est pas disponible en stock");
+            }
+            item.setOrder(newOrder);
+            item.getProduct().setStock(item.getProduct().getStock() - item.getQuantity());
+        }
+
         newOrder.setCart(cartItems);
         orderRepository.save(newOrder);
 
