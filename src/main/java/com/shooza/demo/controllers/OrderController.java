@@ -6,10 +6,8 @@ import com.shooza.demo.DTO.StatusUpdateRequest;
 import com.shooza.demo.models.CartItem;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.models.Order;
-import com.shooza.demo.repositories.CartItemRepository;
-import com.shooza.demo.repositories.OrderRepository;
-import com.shooza.demo.repositories.PromoCodeRepository;
-import com.shooza.demo.repositories.UserRepository;
+import com.shooza.demo.models.Product;
+import com.shooza.demo.repositories.*;
 import com.shooza.demo.utils.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ public class OrderController {
     private OrderRepository orderRepository;
     @Autowired
     private CartItemRepository cartItemRepository;
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -57,7 +57,9 @@ public class OrderController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le produit " + item.getProduct().getName() + " n'est pas disponible en stock");
             }
             item.setOrder(newOrder);
-            item.getProduct().setStock(item.getProduct().getStock() - item.getQuantity());
+
+            Product currentProduct = productRepository.getReferenceById(item.getProduct().getId());
+            currentProduct.setStock(currentProduct.getStock() - item.getQuantity());
         }
 
         newOrder.setCart(cartItems);
