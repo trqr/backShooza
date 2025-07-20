@@ -8,6 +8,7 @@ import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.models.Order;
 import com.shooza.demo.models.Product;
 import com.shooza.demo.repositories.*;
+import com.shooza.demo.services.OrderService;
 import com.shooza.demo.utils.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class OrderController {
     private PromoCodeRepository promoCodeRepository;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private OrderService orderService;
     @Autowired
     private CartItemRepository cartItemRepository;
     @Autowired
@@ -92,7 +95,6 @@ public class OrderController {
         }
 
         String token = authHeader.substring(7);
-        String email = jwtUtil.extractUsername(token);
         String role = jwtUtil.extractRole(token);
 
         if (!role.equals("USER") && !role.equals("ADMIN")) {
@@ -104,19 +106,6 @@ public class OrderController {
 
     @GetMapping("order/all")
     public ResponseEntity<?> getOrders(@RequestHeader("Authorization") String authHeader){
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
-        }
-
-        String token = authHeader.substring(7);
-        String email = jwtUtil.extractUsername(token);
-        String role = jwtUtil.extractRole(token);
-
-        if (!role.equals("ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès interdit");
-        }
-
-        return ResponseEntity.ok(orderRepository.findAll());
+        return orderService.getOrders(authHeader);
     }
 }

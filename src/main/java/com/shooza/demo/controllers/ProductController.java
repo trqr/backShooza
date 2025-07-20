@@ -1,6 +1,7 @@
 package com.shooza.demo.controllers;
 
 
+import com.shooza.demo.DTO.ProductStockRequest;
 import com.shooza.demo.models.Product;
 import com.shooza.demo.repositories.ProductRepository;
 import com.shooza.demo.services.ProductService;
@@ -35,5 +36,10 @@ public class ProductController {
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable("id") int id){
         return productService.getById(id);
+    }
+
+    @PutMapping("/stock")
+    public List<Product> setProductStock(@RequestBody ProductStockRequest request){
+        return productService.setProductsStock(request);
     }
 }
