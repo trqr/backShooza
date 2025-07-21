@@ -18,7 +18,7 @@ public class JwtUtil {
                 .withSubject(email)
                 .withClaim("role", role)
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 1400 * 30))
                 .sign(ALGORITHM);
     }
 
