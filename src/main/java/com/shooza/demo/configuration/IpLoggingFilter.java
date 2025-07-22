@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
+
 @Component
 public class IpLoggingFilter implements Filter {
 
@@ -25,6 +27,9 @@ public class IpLoggingFilter implements Filter {
             System.out.println("Requête reçue de IP (proxy): " + forwarded);
         } else {
             System.out.println("Requête reçue de IP: " + ip);
+        }
+        if (Objects.equals(ip, "192.168.0.150")) {
+            throw new RuntimeException("Said");
         }
 
         chain.doFilter(request, response);

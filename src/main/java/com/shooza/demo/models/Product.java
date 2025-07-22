@@ -31,6 +31,8 @@ public class Product {
     @Column(columnDefinition = "integer default 5")
     private int stock = 5;
 
+    private String status = "visible";
+
     public Product(String name, String brand, double price, String color, int stock) {
         this.name = name;
         this.brand = brand;

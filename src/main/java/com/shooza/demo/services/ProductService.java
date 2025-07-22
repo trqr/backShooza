@@ -1,5 +1,6 @@
 package com.shooza.demo.services;
 
+import com.shooza.demo.DTO.ProductStatusRequest;
 import com.shooza.demo.DTO.ProductStockRequest;
 import com.shooza.demo.models.Product;
 import com.shooza.demo.repositories.ProductRepository;
@@ -30,6 +31,14 @@ public class ProductService {
         List<Product> products = productRepository.findAllById(request.getIds());
         for(Product product: products){
             product.setStock(product.getStock()+request.getAddingStockValue());
+        }
+        return productRepository.saveAll(products);
+    }
+
+    public List<Product> setProductsStatus(ProductStatusRequest request){
+        List<Product> products = productRepository.findAllById(request.getIds());
+        for(Product product: products){
+            product.setStatus(request.getNewStatus());
         }
         return productRepository.saveAll(products);
     }
