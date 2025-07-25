@@ -11,6 +11,7 @@ import com.shooza.demo.repositories.*;
 import com.shooza.demo.services.OrderService;
 import com.shooza.demo.utils.JwtUtil;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class OrderController {
 
     @Transactional
     @PostMapping("/order/create-order")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequest orderRequest){
         Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(orderRequest.getPromoCode());
         CodePromo codePromo;
         codePromo = optionalCodePromo.orElse(null);
@@ -78,7 +79,7 @@ public class OrderController {
     }
 
     @PostMapping("/order/status")
-    public void changeOrderStatus(@RequestBody StatusUpdateRequest request) {
+    public void changeOrderStatus(@Valid @RequestBody StatusUpdateRequest request) {
         List<Order> orders = orderRepository.findAllById(request.getIds());
         for (Order order : orders) {
             order.setStatus(request.getNewStatus());

@@ -1,13 +1,22 @@
 package com.shooza.demo.DTO;
 
 import com.shooza.demo.models.CartItem;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 public class OrderRequest {
+
+    @NotNull(message = "ne peut pas être null")
+    @Email(message = "Le format requis est email")
     private String userEmail;
     private String promoCode;
+    @NotNull
     private double deliveryValue;
+    @NotNull(message = "ne peut pas être null")
+    @Min(0)
     private double totalPrice;
     private List<CartItem> cart;
 

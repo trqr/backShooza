@@ -6,9 +6,11 @@ import com.shooza.demo.DTO.ProductStockRequest;
 import com.shooza.demo.models.Product;
 import com.shooza.demo.repositories.ProductRepository;
 import com.shooza.demo.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,7 +22,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-
 
     @GetMapping
     public List<Product> getProducts(){
@@ -41,12 +42,14 @@ public class ProductController {
     }
 
     @PutMapping("/stock")
-    public ResponseEntity<List<Product>> setProductStock(@RequestBody ProductStockRequest request){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Product>> setProductStock(@Valid @RequestBody ProductStockRequest request){
         return ResponseEntity.ok(productService.setProductsStock(request));
     }
 
     @PutMapping("/status")
-    public ResponseEntity<List<Product>> setProductStatus(@RequestBody ProductStatusRequest request){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Product>> setProductStatus(@Valid @RequestBody ProductStatusRequest request){
         return ResponseEntity.ok(productService.setProductsStatus(request));
     }
 }

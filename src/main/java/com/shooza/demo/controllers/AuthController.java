@@ -5,6 +5,7 @@ import com.shooza.demo.models.User;
 import com.shooza.demo.repositories.UserRepository;
 import com.shooza.demo.services.AuthService;
 import com.shooza.demo.utils.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> signIn(@RequestBody AuthRequest authRequest){
+    public ResponseEntity<?> signIn(@Valid @RequestBody AuthRequest authRequest){
         return authService.signIn(authRequest);
     }
 

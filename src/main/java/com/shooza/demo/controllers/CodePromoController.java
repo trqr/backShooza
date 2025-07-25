@@ -5,9 +5,11 @@ import com.shooza.demo.DTO.PromoCodeResponse;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.repositories.PromoCodeRepository;
 import com.shooza.demo.services.CodePromoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +30,7 @@ public class CodePromoController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addPromo(@RequestHeader("Authorization") String authHeader, @RequestBody CodePromo codepromo){
+    public ResponseEntity<?> addPromo(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody CodePromo codepromo){
         return codePromoService.addPromo(authHeader, codepromo);
     }
 
@@ -38,10 +40,9 @@ public class CodePromoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<PromoCodeResponse> validatePromoCode(@RequestBody PromoCodeRequest request) {
-        String code = request.getCode();
-
-        Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(code);
+        Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(request.getCode());
 
         if (optionalCodePromo.isPresent()) {
             CodePromo codePromo = optionalCodePromo.get();

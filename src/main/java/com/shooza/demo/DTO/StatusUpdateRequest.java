@@ -1,12 +1,15 @@
 package com.shooza.demo.DTO;
 
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 public class StatusUpdateRequest {
+
     private List<Integer> ids;
+    @NotNull(message = "ne peut pas être null")
     private String newStatus;
 }

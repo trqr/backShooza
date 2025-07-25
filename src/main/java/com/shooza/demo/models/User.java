@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @Entity
@@ -29,6 +30,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Mot de passe obligatoire")
+    @Length(min = 3, message = "Il faut un minimum de 3 caractères pour votre mot de passe.")
     private String password;
 
     private String role = "USER";
