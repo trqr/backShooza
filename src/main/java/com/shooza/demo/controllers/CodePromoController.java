@@ -2,6 +2,7 @@ package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.PromoCodeRequest;
 import com.shooza.demo.DTO.PromoCodeResponse;
+import com.shooza.demo.exceptions.InvalidPromoCodeException;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.repositories.PromoCodeRepository;
 import com.shooza.demo.services.CodePromoService;
@@ -25,30 +26,26 @@ public class CodePromoController {
     private CodePromoService codePromoService;
 
     @GetMapping("/all")
-    public ResponseEntity<?> getPromos(@RequestHeader("Authorization") String authHeader){
-        return codePromoService.getPromos(authHeader);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getPromos(){
+        return codePromoService.getPromos();
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addPromo(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody CodePromo codepromo){
-        return codePromoService.addPromo(authHeader, codepromo);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> addPromo(@Valid @RequestBody CodePromo codepromo){
+        return codePromoService.addPromo(codepromo);
     }
 
     @PostMapping("/delete")
-    public void deletePromos(@RequestHeader("Authorization") String authHeader, @RequestBody List<Integer> ids){
-        codePromoService.deletePromos(authHeader, ids);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deletePromos(@RequestBody List<Integer> ids){
+        codePromoService.deletePromos(ids);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<PromoCodeResponse> validatePromoCode(@RequestBody PromoCodeRequest request) {
-        Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(request.getCode());
-
-        if (optionalCodePromo.isPresent()) {
-            CodePromo codePromo = optionalCodePromo.get();
-            return ResponseEntity.ok(new PromoCodeResponse(true, "Code promo appliqué avec succès.", codePromo.getPercentage()));
-        } else {
-            return ResponseEntity.ok(new PromoCodeResponse(false, "Le code promo est invalide.", 0));
-        }
+        return ResponseEntity.ok(codePromoService.validatePromoCode(request));
     }
 }

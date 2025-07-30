@@ -8,6 +8,9 @@ import com.shooza.demo.utils.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -31,27 +34,10 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
-        }
-
-        String token = authHeader.substring(7);
-        String email;
-
-        try {
-            email = jwtUtil.extractUsername(token);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
-        }
-
-        Optional<User> userOptional = userRepository.findOptionalByEmail(email);
-
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
-        }
-
-        User user = userOptional.get();
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findOptionalByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
         return ResponseEntity.ok(user);
     }
 }

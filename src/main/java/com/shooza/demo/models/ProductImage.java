@@ -11,7 +11,7 @@ import lombok.Setter;
 public class ProductImage {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
     @JoinColumn(name= "product_id")

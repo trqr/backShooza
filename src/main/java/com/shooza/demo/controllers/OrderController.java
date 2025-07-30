@@ -1,12 +1,9 @@
 package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.OrderRequest;
-import com.shooza.demo.DTO.OrderResponse;
 import com.shooza.demo.DTO.StatusUpdateRequest;
-import com.shooza.demo.models.CartItem;
-import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.models.Order;
-import com.shooza.demo.models.Product;
+import com.shooza.demo.models.User;
 import com.shooza.demo.repositories.*;
 import com.shooza.demo.services.OrderService;
 import com.shooza.demo.utils.JwtUtil;
@@ -15,10 +12,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -27,86 +26,37 @@ public class OrderController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private PromoCodeRepository promoCodeRepository;
-    @Autowired
     private OrderRepository orderRepository;
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private CartItemRepository cartItemRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @Transactional
     @PostMapping("/order/create-order")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequest orderRequest){
-        Optional<CodePromo> optionalCodePromo = promoCodeRepository.findByCode(orderRequest.getPromoCode());
-        CodePromo codePromo;
-        codePromo = optionalCodePromo.orElse(null);
-
-        Order newOrder = new Order(
-                userRepository.findByEmail(orderRequest.getUserEmail()),
-                codePromo,
-                orderRequest.getDeliveryValue(),
-                orderRequest.getTotalPrice(),
-                null
-        );
-
-        List<CartItem> cartItems = orderRequest.getCart();
-
-        for (CartItem item : cartItems) {
-            if (item.getProduct().getStock() < item.getQuantity()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le produit " + item.getProduct().getName() + " n'est pas disponible en stock");
-            }
-            item.setOrder(newOrder);
-
-            Product currentProduct = productRepository.getReferenceById(item.getProduct().getId());
-            currentProduct.setStock(currentProduct.getStock() - item.getQuantity());
-        }
-
-        newOrder.setCart(cartItems);
-        orderRepository.save(newOrder);
-
-        return ResponseEntity.ok(new OrderResponse(true, newOrder.getTotalPrice(), newOrder.getStatus(), "Commande enregistrée") {
-        });
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(orderRequest));
     }
 
     @PostMapping("/order/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteOrders(@RequestBody List<Integer> ids) {
         orderRepository.deleteAllById(ids);
     }
 
     @PostMapping("/order/status")
-    public void changeOrderStatus(@Valid @RequestBody StatusUpdateRequest request) {
-        List<Order> orders = orderRepository.findAllById(request.getIds());
-        for (Order order : orders) {
-            order.setStatus(request.getNewStatus());
-        }
-        orderRepository.saveAll(orders);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Order>> changeOrderStatus(@Valid @RequestBody StatusUpdateRequest request) {
+        return ResponseEntity.ok(orderService.changeOrderStatus(request));
     }
 
     @GetMapping("order/user")
-    public ResponseEntity<?> getUserOrders(        @RequestHeader("Authorization") String authHeader,
-                                             @RequestParam("userId") int userId) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
-        }
-
-        String token = authHeader.substring(7);
-        String role = jwtUtil.extractRole(token);
-
-        if (!role.equals("USER") && !role.equals("ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Accès interdit");
-        }
-
-        return ResponseEntity.ok(orderRepository.findOrdersWithoutUser(userId));
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<Order>> getUserOrders(@RequestParam("userId") int userId, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(orderService.getUserOrders(userId, userDetails));
     }
 
     @GetMapping("order/all")
-    public ResponseEntity<?> getOrders(@RequestHeader("Authorization") String authHeader){
-        return orderService.getOrders(authHeader);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Order>> getOrders(){
+        return ResponseEntity.ok(orderService.getOrders());
     }
 }
