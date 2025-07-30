@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
+
 
 @Service
 public class AuthService {
@@ -37,9 +39,11 @@ public class AuthService {
             AuthResponse response = new AuthResponse(token, userDTO);
             return ResponseEntity.ok(response);
         }
-
-
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong email or password.");
     }
 
+    public User getCurrentUser(Principal principal){
+        return userRepository.findOptionalByEmail(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+    }
 }

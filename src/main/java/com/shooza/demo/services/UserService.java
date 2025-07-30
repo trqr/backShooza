@@ -1,5 +1,7 @@
 package com.shooza.demo.services;
 
+import com.shooza.demo.DTO.RegisterRequest;
+import com.shooza.demo.DTO.RegisterResponse;
 import com.shooza.demo.models.User;
 import com.shooza.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +18,20 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<String> registerUser(User user){
-        if (userRepository.existsByEmail(user.getEmail())){
-            return ResponseEntity.ok("user already exists");
+    public RegisterResponse registerUser(RegisterRequest request){
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("User already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         userRepository.save(user);
-        return ResponseEntity.ok("user registered successfully");
+
+        return new RegisterResponse(user.getFirstName(), user.getLastName(), user.getEmail(), "user registered successfully");
     }
 
 }

@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -72,8 +73,8 @@ public class OrderService {
         return orderRepository.saveAll(orders);
     }
 
-    public List<Order> getUserOrders(int userId, UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername());
+    public List<Order> getUserOrders(int userId, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()); //getName retourne l'email
         if (user.getId() != userId) {
             throw new IllegalArgumentException("L'utilisateur n'a pas cet ID");
         }

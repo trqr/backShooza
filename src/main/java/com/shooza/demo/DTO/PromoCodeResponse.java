@@ -3,7 +3,6 @@ package com.shooza.demo.DTO;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
 public class PromoCodeResponse {
     private boolean success;

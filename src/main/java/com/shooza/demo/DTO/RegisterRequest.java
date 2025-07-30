@@ -1,24 +1,14 @@
-package com.shooza.demo.models;
+package com.shooza.demo.DTO;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
-@Entity
-@NoArgsConstructor
-public class User {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private Integer id;
+public class RegisterRequest {
 
     @NotBlank(message = "Prenom obligatoire")
     private String firstName;
@@ -34,9 +24,9 @@ public class User {
     @Length(min = 3, message = "Il faut un minimum de 3 caractères pour votre mot de passe.")
     private String password;
 
-    private String role = "USER";
+    public RegisterRequest() {}
 
-    public User(String firstName, String lastName, String email, String password){
+    public RegisterRequest(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

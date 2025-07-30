@@ -2,29 +2,25 @@ package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.OrderRequest;
 import com.shooza.demo.DTO.StatusUpdateRequest;
+import com.shooza.demo.configuration.AdminOnly;
 import com.shooza.demo.models.Order;
-import com.shooza.demo.models.User;
 import com.shooza.demo.repositories.*;
 import com.shooza.demo.services.OrderService;
-import com.shooza.demo.utils.JwtUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class OrderController {
 
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -37,25 +33,24 @@ public class OrderController {
     }
 
     @PostMapping("/order/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public void deleteOrders(@RequestBody List<Integer> ids) {
         orderRepository.deleteAllById(ids);
     }
 
     @PostMapping("/order/status")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public ResponseEntity<List<Order>> changeOrderStatus(@Valid @RequestBody StatusUpdateRequest request) {
         return ResponseEntity.ok(orderService.changeOrderStatus(request));
     }
 
     @GetMapping("order/user")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<Order>> getUserOrders(@RequestParam("userId") int userId, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(orderService.getUserOrders(userId, userDetails));
+    public ResponseEntity<List<Order>> getUserOrders(@RequestParam("userId") int userId, Principal principal) {
+        return ResponseEntity.ok(orderService.getUserOrders(userId, principal));
     }
 
     @GetMapping("order/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public ResponseEntity<List<Order>> getOrders(){
         return ResponseEntity.ok(orderService.getOrders());
     }

@@ -2,6 +2,7 @@ package com.shooza.demo.controllers;
 
 import com.shooza.demo.DTO.PromoCodeRequest;
 import com.shooza.demo.DTO.PromoCodeResponse;
+import com.shooza.demo.configuration.AdminOnly;
 import com.shooza.demo.exceptions.InvalidPromoCodeException;
 import com.shooza.demo.models.CodePromo;
 import com.shooza.demo.repositories.PromoCodeRepository;
@@ -21,30 +22,27 @@ import java.util.Optional;
 public class CodePromoController {
 
     @Autowired
-    private PromoCodeRepository promoCodeRepository;
-    @Autowired
     private CodePromoService codePromoService;
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public ResponseEntity<?> getPromos(){
         return codePromoService.getPromos();
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public ResponseEntity<?> addPromo(@Valid @RequestBody CodePromo codepromo){
         return codePromoService.addPromo(codepromo);
     }
 
     @PostMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @AdminOnly
     public void deletePromos(@RequestBody List<Integer> ids){
         codePromoService.deletePromos(ids);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<PromoCodeResponse> validatePromoCode(@RequestBody PromoCodeRequest request) {
         return ResponseEntity.ok(codePromoService.validatePromoCode(request));
     }
