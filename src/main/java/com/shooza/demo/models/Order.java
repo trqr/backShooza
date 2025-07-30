@@ -31,13 +31,13 @@ public class Order {
 
     private double delivery;
     private double totalPrice;
-    private String status;
+    private String status = "pending";
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<CartItem> cart;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Order(User user, CodePromo codepromo, double delivery, double totalPrice, List<CartItem> cart) {
         this.user = user;

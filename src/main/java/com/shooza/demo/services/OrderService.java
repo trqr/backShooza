@@ -35,29 +35,22 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
+        Order newOrder = new Order();
+
         CodePromo codePromo = promoCodeRepository.findByCode(orderRequest.getPromoCode())
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseGet(() -> new CodePromo("NONE", 0));
 
         User buyer = userRepository.findByEmail(orderRequest.getUserEmail());
 
         List<CartItem> cartItems = orderRequest.getCart();
 
-        Order newOrder = new Order();
+        double totalPriceWithoutDelivery = updateStockItemsAndGetTotalPrice(cartItems, newOrder);
 
-        for (CartItem item : cartItems) {
-            if (item.getProduct().getStock() < item.getQuantity()) {
-                throw new IllegalArgumentException("Le produit " + item.getProduct().getName() + " n'est pas disponible en stock");
-            }
-            item.setOrder(newOrder);
-
-            Product currentProduct = productRepository.getReferenceById(item.getProduct().getId());
-            currentProduct.setStock(currentProduct.getStock() - item.getQuantity());
-        }
-
+        System.out.println(totalPriceWithoutDelivery);
         newOrder.setUser(buyer);
         newOrder.setCodepromo(codePromo);
         newOrder.setDelivery(orderRequest.getDeliveryValue());
-        newOrder.setTotalPrice(orderRequest.getTotalPrice());
+        newOrder.setTotalPrice((totalPriceWithoutDelivery*(100 - codePromo.getPercentage())/100) + orderRequest.getDeliveryValue());
         newOrder.setCart(cartItems);
 
         orderRepository.save(newOrder);
@@ -81,5 +74,19 @@ public class OrderService {
         return orderRepository.findOrdersWithoutUser(userId);
     }
 
-    private void updateStockItemsAndGetTotalPrice(){}
+    private double updateStockItemsAndGetTotalPrice(List<CartItem> cartItems, Order newOrder){
+        double totalPrice = 0;
+        for (CartItem item : cartItems) {
+            if (item.getProduct().getStock() < item.getQuantity()) {
+                throw new IllegalArgumentException("Le produit " + item.getProduct().getName() + " n'est pas disponible en stock");
+            }
+            item.setOrder(newOrder);
+
+            totalPrice += (item.getProduct().getPrice() * item.getQuantity());
+
+            Product currentProduct = productRepository.getReferenceById(item.getProduct().getId());
+            currentProduct.setStock(currentProduct.getStock() - item.getQuantity());
+        }
+        return totalPrice;
+    }
 }

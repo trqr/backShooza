@@ -1,8 +1,6 @@
 package com.shooza.demo.models;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -22,4 +20,13 @@ public class CodePromo {
     @Min(value = 0, message = "Le pourcentage du code promo ne peux pas être inférieur à 0")
     @Max(value = 100, message = "Le pourcentage du code promo ne peux pas être supérieur à 100")
     private int percentage;
+
+    public CodePromo() {
+    }
+
+
+    public CodePromo(String code, int percentage) {
+        this.code = code;
+        this.percentage = percentage;
+    }
 }
