@@ -1,7 +1,7 @@
 package com.shooza.demo.controllers;
 
-import com.shooza.demo.DTO.RegisterRequest;
-import com.shooza.demo.DTO.RegisterResponse;
+import com.shooza.demo.DTO.RegisterDTOs.RegisterRequest;
+import com.shooza.demo.DTO.RegisterDTOs.RegisterResponse;
 import com.shooza.demo.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.shooza.demo.DTO;
+package com.shooza.demo.DTO.RegisterDTOs;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,18 +10,18 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 public class RegisterRequest {
 
-    @NotBlank(message = "Prenom obligatoire")
+    @NotBlank(message = "First name is needed")
     private String firstName;
 
-    @NotBlank(message = "Nom obligatoire")
+    @NotBlank(message = "Last Name is needed")
     private String lastName;
 
-    @Email(message = "Format email invalide")
-    @NotBlank(message = "Email obligatoire")
+    @Email(message = "Email format invalid")
+    @NotBlank(message = "Email is needed")
     private String email;
 
-    @NotBlank(message = "Mot de passe obligatoire")
-    @Length(min = 3, message = "Il faut un minimum de 3 caractères pour votre mot de passe.")
+    @NotBlank(message = "Password is needed")
+    @Length(min = 3, message = "Your password must be at least 3 characters long.")
     private String password;
 
     public RegisterRequest() {}
