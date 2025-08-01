@@ -19,6 +19,7 @@ public class CheckRoles {
         String token = authHeader.substring(7);
         String role = jwtUtil.extractRole(token);
         return "ADMIN".equals(role);
+
     }
 
     public boolean isUser(String authHeader) {
