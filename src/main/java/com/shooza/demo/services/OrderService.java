@@ -45,12 +45,13 @@ public class OrderService {
         List<CartItem> cartItems = orderRequest.getCart();
 
         double totalPriceWithoutDelivery = updateStockItemsAndGetTotalPrice(cartItems, newOrder);
+        double finalPrice = (totalPriceWithoutDelivery*(100 - codePromo.getPercentage())/100) + orderRequest.getDeliveryValue();
 
         System.out.println(totalPriceWithoutDelivery);
         newOrder.setUser(buyer);
         newOrder.setCodepromo(codePromo);
         newOrder.setDelivery(orderRequest.getDeliveryValue());
-        newOrder.setTotalPrice((totalPriceWithoutDelivery*(100 - codePromo.getPercentage())/100) + orderRequest.getDeliveryValue());
+        newOrder.setTotalPrice(finalPrice);
         newOrder.setCart(cartItems);
 
         orderRepository.save(newOrder);
